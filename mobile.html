@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillBridge - Microlearning Platform</title>
+<style>
+/* ── TOKENS ── */
+:root{
+  --primary:#14B8A6;
+  --primary-light:#e6faf8;
+  --secondary:#3B82F6;
+  --bg:#f5f7fb;
+  --card:#ffffff;
+  --text:#1f2937;
+  --muted:#6b7280;
+  --border:#e5e7eb;
+  --drawer-w:280px;
+  --radius-lg:20px;
+  --radius-md:14px;
+  --radius-sm:10px;
+  --shadow-card:0 6px 20px rgba(0,0,0,.06);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:'Segoe UI',system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ═══════════════════════════════════
+   LANDING PAGE
+═══════════════════════════════════ */
+.container{max-width:1200px;margin:auto;padding:0 20px}
+.lp-header{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--border);z-index:100}
+.lp-header .container{display:flex;justify-content:space-between;align-items:center;padding:16px 20px}
+.logo{font-weight:700;font-size:1.5rem;color:var(--primary)}
+.nav a{margin-left:18px;text-decoration:none;color:var(--text);font-size:.95rem}
+.hero{padding:90px 20px;background:linear-gradient(180deg,#fff,#eef8f7)}
+.hero-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:30px;align-items:center}
+.hero-card,.card{background:#fff;border-radius:var(--radius-lg);padding:24px;box-shadow:0 10px 30px rgba(0,0,0,.06)}
+.hero h1{font-size:3rem;margin-bottom:12px;line-height:1.15}
+.btn{padding:12px 18px;border:none;border-radius:var(--radius-md);cursor:pointer;font-size:.9rem;font-weight:500;transition:opacity .15s}
+.btn:active{opacity:.8}
+.btn-primary{background:var(--primary);color:#fff}
+.lp-section{padding:70px 20px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px}
+.lp-skill,.lp-course{background:#fff;border-radius:18px;padding:20px;box-shadow:var(--shadow-card)}
+
+/* ═══════════════════════════════════
+   DASHBOARD SHELL
+═══════════════════════════════════ */
+#dashboardPage{display:none}
+
+/* ── Drawer overlay ── */
+.drawer-overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.48);
+  z-index:299;
+  opacity:0;
+  transition:opacity .25s ease;
+}
+.drawer-overlay.visible{
+  display:block;
+  opacity:1;
+}
+
+/* ── Layout shell ── */
+.dashboard{display:flex;min-height:100vh}
+
+/* ── Sidebar (desktop: static panel) ── */
+.sidebar{
+  width:var(--drawer-w);
+  background:#fff;
+  padding:24px 16px;
+  border-right:1px solid var(--border);
+  overflow-y:auto;
+  flex-shrink:0;
+}
+.sidebar-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:20px;
+}
+.sidebar-title{
+  font-size:.75rem;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+.sidebar-close{
+  display:none; /* shown only on mobile */
+  background:none;
+  border:none;
+  font-size:1.3rem;
+  cursor:pointer;
+  color:var(--muted);
+  padding:4px 6px;
+  border-radius:6px;
+}
+.sidebar ul{list-style:none}
+.sidebar li{
+  padding:11px 14px;
+  border-radius:var(--radius-sm);
+  margin-bottom:4px;
+  background:#f8fafc;
+  cursor:pointer;
+  font-size:.88rem;
+  color:var(--text);
+  transition:background .15s, color .15s;
+  user-select:none;
+}
+.sidebar li:hover{background:var(--primary-light);color:var(--primary)}
+.sidebar li.active{background:var(--primary-light);color:var(--primary);font-weight:600}
+
+/* ── Main content area ── */
+.main{flex:1;padding:24px;overflow:hidden;min-width:0}
+
+/* ── TopBar (desktop: single row) ── */
+.topbar{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:24px;
+}
+.menu-btn{
+  display:none;
+  background:#fff;
+  border:none;
+  border-radius:var(--radius-md);
+  padding:10px 13px;
+  font-size:1.1rem;
+  cursor:pointer;
+  line-height:1;
+  box-shadow:var(--shadow-card);
+  flex-shrink:0;
+  transition:background .15s;
+}
+.menu-btn:active{background:#f0f0f0}
+.search{
+  flex:1;
+  background:#fff;
+  padding:12px 15px;
+  border-radius:var(--radius-md);
+  box-shadow:var(--shadow-card);
+  font-size:.9rem;
+  color:var(--muted);
+  /* Prevent text wrapping on all viewports */
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  cursor:text;
+}
+.profile{
+  background:#fff;
+  padding:11px 16px;
+  border-radius:var(--radius-md);
+  box-shadow:var(--shadow-card);
+  font-size:.88rem;
+  font-weight:500;
+  white-space:nowrap;
+  flex-shrink:0;
+}
+
+/* ── Section labels ── */
+.section-label{
+  font-size:1rem;
+  font-weight:700;
+  color:var(--text);
+  margin-bottom:14px;
+}
+
+/* ── Welcome / progress ── */
+.welcome{display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:24px}
+.welcome .card h2{font-size:1.3rem;margin-bottom:6px}
+.welcome .card p{font-size:.88rem;color:var(--muted);margin-top:4px}
+.progress{height:10px;background:#e5e7eb;border-radius:99px;overflow:hidden;margin:12px 0 6px}
+.progress span{display:block;height:100%;background:var(--primary);border-radius:99px}
+.progress-label{font-size:.8rem;font-weight:600;color:var(--primary) !important}
+.achievement-card{display:flex;flex-direction:column;gap:10px}
+.badge{
+  display:inline-block;
+  padding:6px 12px;
+  background:#d1fae5;
+  color:#065f46;
+  border-radius:999px;
+  font-size:.8rem;
+  font-weight:600;
+}
+
+/* ── Course grid (desktop: auto-fit columns) ── */
+.course-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+  gap:16px;
+  margin-bottom:24px;
+}
+.course-card{
+  background:#fff;
+  border-radius:var(--radius-lg);
+  padding:20px;
+  box-shadow:var(--shadow-card);
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.course-card h4{font-size:.95rem;font-weight:700}
+.course-meta{font-size:.8rem;color:var(--muted)}
+.course-progress-bar{height:4px;background:#e5e7eb;border-radius:99px;overflow:hidden;margin:6px 0 2px}
+.course-progress-bar span{display:block;height:100%;background:var(--primary)}
+.course-pct{font-size:.75rem;color:var(--primary);font-weight:600}
+.course-card .btn{margin-top:auto;padding:9px 0;width:100%;font-size:.82rem}
+
+/* ── Stats ── */
+.stats-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:16px;
+  margin-bottom:24px;
+}
+.stat{
+  background:#fff;
+  padding:22px 16px;
+  border-radius:var(--radius-lg);
+  text-align:center;
+  box-shadow:var(--shadow-card);
+}
+.stat h2{font-size:1.6rem;font-weight:700;color:var(--text)}
+.stat p{font-size:.78rem;color:var(--muted);margin-top:4px}
+
+/* ═══════════════════════════════════
+   MOBILE — 360–430 px
+═══════════════════════════════════ */
+@media(max-width:768px){
+
+  /* ── Sidebar becomes a fixed drawer ── */
+  .sidebar{
+    position:fixed;
+    left:0;
+    top:0;
+    height:100%;
+    z-index:300;
+    width:var(--drawer-w);
+    border-right:none;
+    /* Start off-screen to the left */
+    transform:translateX(calc(-1 * var(--drawer-w) - 12px));
+    transition:transform .28s cubic-bezier(.4,0,.2,1),
+               box-shadow .28s ease;
+    box-shadow:none;
+    padding:20px 14px;
+    /* Allow scroll inside drawer */
+    overflow-y:auto;
+    overscroll-behavior:contain;
+  }
+  .sidebar.open{
+    transform:translateX(0);
+    box-shadow:12px 0 40px rgba(0,0,0,.22);
+  }
+  .sidebar-close{display:flex;align-items:center;justify-content:center}
+
+  /* ── Shell ── */
+  .dashboard{display:block}
+  .main{padding:14px 14px 32px}
+
+  /* ── Hamburger visible ── */
+  .menu-btn{display:flex;align-items:center;justify-content:center}
+
+  /* ── TopBar: 3 stacked rows ── */
+  .topbar{
+    flex-direction:column;
+    align-items:stretch;
+    gap:8px;
+    margin-bottom:16px;
+  }
+  /* Row 1: hamburger left-aligned only */
+  .topbar > .menu-btn{
+    align-self:flex-start;
+    padding:9px 12px;
+    font-size:1rem;
+  }
+  /* Row 2: search fills full width — already block via stretch */
+  .search{
+    padding:11px 14px;
+    font-size:.88rem;
+    border-radius:12px;
+  }
+  /* Row 3: profile compact chip */
+  .profile{
+    font-size:.78rem;
+    padding:8px 12px;
+    border-radius:12px;
+    font-weight:500;
+  }
+
+  /* ── Reorder sections: Continue → Welcome → Stats ── */
+  .main-content{
+    display:flex;
+    flex-direction:column;
+  }
+  .sec-continue{order:1}
+  .sec-welcome{order:2}
+  .sec-stats{order:3}
+
+  /* ── Continue Learning: horizontal scroll snap ── */
+  .course-grid{
+    display:flex;
+    overflow-x:auto;
+    scroll-snap-type:x mandatory;
+    gap:12px;
+    padding-bottom:6px;
+    margin-bottom:20px;
+    /* hide scrollbar but keep scroll */
+    -ms-overflow-style:none;
+    scrollbar-width:none;
+  }
+  .course-grid::-webkit-scrollbar{display:none}
+  .course-card{
+    flex:0 0 185px;
+    scroll-snap-align:start;
+    border-radius:16px;
+    padding:16px 14px;
+    gap:4px;
+  }
+  .course-card h4{font-size:.88rem}
+  .course-card .btn{
+    font-size:.78rem;
+    padding:8px 0;
+    border-radius:10px;
+    margin-top:8px;
+  }
+
+  /* ── Welcome section compact ── */
+  .welcome{
+    grid-template-columns:1fr;
+    gap:10px;
+    margin-bottom:20px;
+  }
+  .welcome .card{
+    padding:16px;
+    border-radius:16px;
+  }
+  .welcome .card h2{font-size:1.05rem}
+  .achievement-card{
+    flex-direction:row;
+    align-items:center;
+    padding:14px 16px;
+  }
+  .achievement-card h3{font-size:.9rem;margin-bottom:0}
+
+  /* ── Stats: 2×2 grid ── */
+  .stats-grid{
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+    margin-bottom:16px;
+  }
+  .stat{
+    padding:16px 10px;
+    border-radius:14px;
+  }
+  .stat h2{font-size:1.35rem}
+  .stat p{font-size:.75rem}
+
+  /* ── Section label tighter ── */
+  .section-label{margin-bottom:10px;font-size:.92rem}
+}
+
+/* ── Very narrow screens ── */
+@media(max-width:380px){
+  .course-card{flex:0 0 168px}
+  .profile{font-size:.72rem}
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════
+     LANDING PAGE
+════════════════════════════ -->
+<div id="landingPage">
+<header class="lp-header">
+  <div class="container">
+    <div class="logo">SkillBridge</div>
+    <nav class="nav">
+      <a href="#tentang">Tentang</a>
+      <a href="#skills">Skills</a>
+      <a href="#kursus">Kursus</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container hero-grid">
+    <div>
+      <h1>Platform Pelatihan Singkat High‑Demand Skills Berbasis Microlearning</h1>
+      <p>Tingkatkan keterampilan profesional melalui pembelajaran singkat, fokus, dan relevan dengan kebutuhan industri modern.</p>
+      <br>
+      <button class="btn btn-primary" onclick="showDashboard()">Mulai Belajar</button>
+    </div>
+    <div class="hero-card">
+      <h3>Learning Snapshot</h3><br>
+      <p>✓ 45+ Kursus</p>
+      <p>✓ 15.000+ Peserta</p>
+      <p>✓ 87% Tingkat Penyelesaian</p>
+      <p>✓ Sertifikat Penyelesaian</p>
+    </div>
+  </div>
+</section>
+
+<section id="tentang" class="lp-section">
+  <div class="container">
+    <h2>Tentang Platform Kami</h2><br>
+    <div class="grid3">
+      <div class="card"><h3>Microlearning</h3><p>Materi 5–15 menit agar mudah dipelajari kapan saja.</p></div>
+      <div class="card"><h3>Career Ready</h3><p>Fokus pada keterampilan yang dicari industri.</p></div>
+      <div class="card"><h3>Praktis</h3><p>Belajar dengan proyek dan studi kasus nyata.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="skills" class="lp-section">
+  <div class="container">
+    <h2>Keterampilan Populer</h2><br>
+    <div class="grid3">
+      <div class="lp-skill">📊 Data Analysis</div>
+      <div class="lp-skill">🤖 AI Prompting</div>
+      <div class="lp-skill">📱 Digital Marketing</div>
+      <div class="lp-skill">🎨 UI/UX Design</div>
+      <div class="lp-skill">💻 Web Development</div>
+      <div class="lp-skill">📈 Business Analytics</div>
+    </div>
+  </div>
+</section>
+
+<section id="kursus" class="lp-section">
+  <div class="container">
+    <h2>Featured Courses</h2><br>
+    <div class="grid3">
+      <div class="lp-course"><h3>Excel Fundamentals</h3><p>Belajar analisis data dasar.</p></div>
+      <div class="lp-course"><h3>Python Fundamentals</h3><p>Otomasi dan pemrosesan data.</p></div>
+      <div class="lp-course"><h3>AI Prompting for Work</h3><p>Meningkatkan produktivitas kerja.</p></div>
+    </div>
+  </div>
+</section>
+</div><!-- /#landingPage -->
+
+
+<!-- ════════════════════════════
+     DASHBOARD PAGE
+════════════════════════════ -->
+<div id="dashboardPage">
+
+  <!-- Overlay: tapping it closes drawer -->
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+
+  <div class="dashboard">
+
+    <!-- ── Sidebar / Mobile Drawer ── -->
+    <aside class="sidebar" id="sidebar" role="navigation" aria-label="Course navigation">
+      <div class="sidebar-header">
+        <span class="sidebar-title">My Learning</span>
+        <!-- X button visible only on mobile -->
+        <button class="sidebar-close" id="sidebarCloseBtn" aria-label="Close navigation">✕</button>
+      </div>
+      <ul>
+        <li onclick="selectCourse(this)">Excel Fundamentals</li>
+        <li onclick="selectCourse(this)">Data Analysis Basics</li>
+        <li onclick="selectCourse(this)">Power BI Essentials</li>
+        <li onclick="selectCourse(this)">Python Fundamentals</li>
+        <li onclick="selectCourse(this)">AI Prompting for Work</li>
+        <li onclick="selectCourse(this)">Canva for Social Media</li>
+        <li onclick="selectCourse(this)">UI/UX Fundamentals</li>
+        <li onclick="selectCourse(this)">Digital Marketing Basics</li>
+        <li onclick="selectCourse(this)">Public Speaking</li>
+        <li onclick="selectCourse(this)">Project Management Basics</li>
+        <li onclick="selectCourse(this)">LinkedIn Optimization</li>
+      </ul>
+    </aside>
+
+    <!-- ── Main ── -->
+    <main class="main" id="mainContent">
+
+      <!-- TopBar: on mobile becomes 3 stacked rows -->
+      <div class="topbar">
+        <button class="menu-btn" id="menuBtn"
+                aria-label="Open course navigation"
+                aria-expanded="false"
+                aria-controls="sidebar">☰</button>
+        <div class="search" role="search">🔍 Cari kursus atau skill...</div>
+        <div class="profile" aria-label="User profile">Muh Assjul &nbsp;•&nbsp; 🔥 7-Day Streak</div>
+      </div>
+
+      <!-- Reorderable content wrapper (mobile uses flexbox order) -->
+      <div class="main-content">
+
+        <!-- ORDER 1 on mobile: Continue Learning -->
+        <div class="sec-continue">
+          <p class="section-label">Continue Learning</p>
+          <div class="course-grid">
+            <div class="course-card">
+              <h4>Excel Fundamentals</h4>
+              <p class="course-meta">5 Lessons</p>
+              <div class="course-progress-bar"><span style="width:75%"></span></div>
+              <p class="course-pct">75% Complete</p>
+              <button class="btn btn-primary">Continue</button>
+            </div>
+            <div class="course-card">
+              <h4>Python Fundamentals</h4>
+              <p class="course-meta">4 Lessons</p>
+              <div class="course-progress-bar"><span style="width:40%"></span></div>
+              <p class="course-pct">40% Complete</p>
+              <button class="btn btn-primary">Continue</button>
+            </div>
+            <div class="course-card">
+              <h4>AI Prompting for Work</h4>
+              <p class="course-meta">6 Lessons</p>
+              <div class="course-progress-bar"><span style="width:90%"></span></div>
+              <p class="course-pct">90% Complete</p>
+              <button class="btn btn-primary">Continue</button>
+            </div>
+            <div class="course-card">
+              <h4>Power BI Essentials</h4>
+              <p class="course-meta">5 Lessons</p>
+              <div class="course-progress-bar"><span style="width:60%"></span></div>
+              <p class="course-pct">60% Complete</p>
+              <button class="btn btn-primary">Continue</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ORDER 2 on mobile: Welcome + Achievement -->
+        <div class="sec-welcome">
+          <div class="welcome">
+            <div class="card">
+              <h2>Welcome Back, Assjul!</h2>
+              <p>Anda telah menyelesaikan 12 modul minggu ini.</p>
+              <div class="progress"><span style="width:72%"></span></div>
+              <p class="progress-label">72% Monthly Goal</p>
+            </div>
+            <div class="card achievement-card">
+              <h3>Achievement</h3>
+              <span class="badge">Consistency Champion</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ORDER 3 on mobile: Weekly Stats -->
+        <div class="sec-stats">
+          <p class="section-label">Weekly Statistics</p>
+          <div class="stats-grid">
+            <div class="stat"><h2>8.5h</h2><p>Learning Time</p></div>
+            <div class="stat"><h2>12</h2><p>Lessons Done</p></div>
+            <div class="stat"><h2>4</h2><p>Badges</p></div>
+            <div class="stat"><h2>92%</h2><p>Avg Score</p></div>
+          </div>
+        </div>
+
+      </div><!-- /.main-content -->
+    </main>
+
+  </div><!-- /.dashboard -->
+</div><!-- /#dashboardPage -->
+
+
+<script>
+/* ── Show dashboard ── */
+function showDashboard(){
+  document.getElementById('landingPage').style.display = 'none';
+  document.getElementById('dashboardPage').style.display = 'block';
+  window.scrollTo(0,0);
+}
+
+/* ── Drawer state ── */
+let isDrawerOpen = false;
+
+function openDrawer(){
+  if(isDrawerOpen) return;
+  isDrawerOpen = true;
+  const sidebar  = document.getElementById('sidebar');
+  const overlay  = document.getElementById('drawerOverlay');
+  const menuBtn  = document.getElementById('menuBtn');
+  sidebar.classList.add('open');
+  // Small rAF tick so CSS transition fires after display:block
+  requestAnimationFrame(()=>{ overlay.classList.add('visible'); });
+  menuBtn.setAttribute('aria-expanded','true');
+  menuBtn.setAttribute('aria-label','Close course navigation');
+  // Lock background scroll
+  document.body.style.overflow = 'hidden';
+}
+
+function closeDrawer(){
+  if(!isDrawerOpen) return;
+  isDrawerOpen = false;
+  const sidebar  = document.getElementById('sidebar');
+  const overlay  = document.getElementById('drawerOverlay');
+  const menuBtn  = document.getElementById('menuBtn');
+  sidebar.classList.remove('open');
+  overlay.classList.remove('visible');
+  menuBtn.setAttribute('aria-expanded','false');
+  menuBtn.setAttribute('aria-label','Open course navigation');
+  document.body.style.overflow = '';
+}
+
+function toggleMenu(){
+  isDrawerOpen ? closeDrawer() : openDrawer();
+}
+
+/* ── Selecting a course closes the drawer ── */
+function selectCourse(el){
+  // Update active state
+  document.querySelectorAll('.sidebar li').forEach(li => li.classList.remove('active'));
+  el.classList.add('active');
+  closeDrawer();
+}
+
+/* ── Wire up event listeners ── */
+document.getElementById('menuBtn').addEventListener('click', toggleMenu);
+document.getElementById('drawerOverlay').addEventListener('click', closeDrawer);
+document.getElementById('sidebarCloseBtn').addEventListener('click', closeDrawer);
+
+/* Escape key closes drawer — user can never be trapped */
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape' && isDrawerOpen) closeDrawer();
+});
+
+/* Focus trap guard: if focus moves outside sidebar while drawer is open,
+   close it (belt-and-suspenders for accessibility) */
+document.getElementById('mainContent').addEventListener('focusin', function(){
+  if(isDrawerOpen) closeDrawer();
+});
+</script>
+</body>
+</html>
