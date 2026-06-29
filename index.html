@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillBridge - Microlearning Platform</title>
+<style>
+/* ── TOKENS ── */
+:root{
+  --primary:#14B8A6;
+  --primary-light:#e6faf8;
+  --secondary:#3B82F6;
+  --bg:#f5f7fb;
+  --card:#ffffff;
+  --text:#1f2937;
+  --muted:#6b7280;
+  --border:#e5e7eb;
+  --radius-lg:20px;
+  --radius-md:14px;
+  --radius-sm:10px;
+  --shadow-card:0 6px 20px rgba(0,0,0,.06);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:'Segoe UI',system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit}
+
+/* ═══════════════════════════════════
+   HEADER
+═══════════════════════════════════ */
+.container{max-width:1200px;margin:auto;padding:0 20px}
+.lp-header{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--border);z-index:100}
+.lp-header .container{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;gap:20px}
+
+.header-left{display:flex;align-items:center;gap:22px}
+.logo-link{display:flex;align-items:center;text-decoration:none;border:none;background:none;cursor:pointer;padding:0}
+.logo{font-weight:700;font-size:1.5rem;color:var(--primary)}
+
+.nav{display:flex;align-items:center}
+.nav a, .nav-btn{
+  margin-left:18px;
+  text-decoration:none;
+  color:var(--text);
+  font-size:.95rem;
+  background:none;
+  border:none;
+  cursor:pointer;
+  font-family:inherit;
+  padding:0;
+}
+.nav-btn:hover, .nav a:hover{color:var(--primary)}
+
+/* ── Sign in / avatar button (top right) ── */
+.signin-btn{
+  width:42px;height:42px;
+  border-radius:50%;
+  background:var(--primary-light);
+  border:2px solid var(--primary);
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+  transition:background .15s;
+  padding:0;
+}
+.signin-btn:hover{background:#d3f3ef}
+.signin-btn svg{width:22px;height:22px}
+
+/* ═══════════════════════════════════
+   HERO
+═══════════════════════════════════ */
+.hero{padding:90px 20px;background:linear-gradient(180deg,#fff,#eef8f7)}
+.hero-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:30px;align-items:center}
+.hero-card,.card{background:#fff;border-radius:var(--radius-lg);padding:24px;box-shadow:0 10px 30px rgba(0,0,0,.06)}
+.hero h1{font-size:3rem;margin-bottom:12px;line-height:1.15}
+.btn{padding:12px 18px;border:none;border-radius:var(--radius-md);cursor:pointer;font-size:.9rem;font-weight:500;transition:opacity .15s}
+.btn:active{opacity:.8}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-dark{background:#1f2937;color:#fff}
+
+/* ═══════════════════════════════════
+   COLOR-BLOCK SECTIONS (image-3 inspired)
+═══════════════════════════════════ */
+.lp-section{padding:70px 20px}
+.lp-section-title{font-size:1.7rem;font-weight:700;margin-bottom:36px;text-align:center}
+
+.block-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:24px;
+}
+.color-block{
+  border-radius:var(--radius-lg);
+  padding:48px 32px;
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:14px;
+}
+.color-block h3{font-size:1.7rem;font-weight:800}
+.color-block p{font-size:.98rem;color:#374151;max-width:340px}
+.color-block .btn{margin-top:10px}
+
+/* Distinct accent backgrounds per block — same family, our palette */
+.block-teal{background:var(--primary-light)}
+.block-blue{background:#e7eefc}
+.block-peach{background:#fdeee6}
+.block-mint{background:#e9f7ee}
+.block-gray{background:#eef0f3}
+.block-yellow{background:#fdf6e0}
+
+/* ═══════════════════════════════════
+   COURSE MODAL
+═══════════════════════════════════ */
+.modal-overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(15,23,42,.55);
+  z-index:500;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+.modal-overlay.open{display:flex}
+.modal{
+  background:#fff;
+  border-radius:var(--radius-lg);
+  width:100%;
+  max-width:760px;
+  max-height:85vh;
+  overflow-y:auto;
+  padding:28px;
+  position:relative;
+}
+.modal-close{
+  position:absolute;
+  top:18px;right:18px;
+  background:none;
+  border:none;
+  font-size:1.4rem;
+  cursor:pointer;
+  color:var(--muted);
+  line-height:1;
+  padding:4px;
+}
+.modal-close:hover{color:var(--text)}
+.modal h2{font-size:1.3rem;margin-bottom:20px}
+.course-modal-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:14px;
+}
+.course-modal-item{
+  border:1px solid var(--border);
+  border-radius:var(--radius-md);
+  padding:18px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  text-align:left;
+  background:#fff;
+  cursor:pointer;
+  transition:border-color .15s, background .15s;
+}
+.course-modal-item:hover{border-color:var(--primary);background:var(--primary-light)}
+.course-modal-icon{font-size:1.6rem}
+.course-modal-item h4{font-size:.95rem;font-weight:700}
+.course-modal-item p{font-size:.8rem;color:var(--muted)}
+
+/* ═══════════════════════════════════
+   MOBILE — 360–430 px
+═══════════════════════════════════ */
+@media(max-width:768px){
+  .hero{padding:50px 16px}
+  .hero-grid{grid-template-columns:1fr}
+  .hero h1{font-size:2rem}
+
+  .lp-header .container{padding:14px 14px;gap:8px}
+  .header-left{gap:10px;min-width:0}
+  .nav a, .nav-btn{margin-left:8px;font-size:.74rem}
+  .signin-btn{width:32px;height:32px;flex-shrink:0}
+  .signin-btn svg{width:16px;height:16px}
+
+  .lp-section{padding:44px 16px}
+  .lp-section-title{font-size:1.3rem;margin-bottom:24px}
+  .block-grid{grid-template-columns:1fr;gap:16px}
+  .color-block{padding:32px 22px}
+  .color-block h3{font-size:1.3rem}
+
+  .course-modal-grid{grid-template-columns:1fr}
+  .modal{padding:20px}
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════
+     HEADER
+════════════════════════════ -->
+<header class="lp-header">
+  <div class="container">
+    <div class="header-left">
+      <a href="index.html" class="logo-link" aria-label="SkillBridge - kembali ke beranda">
+        <span class="logo">SkillBridge</span>
+      </a>
+      <nav class="nav">
+        <a href="#tentang">Tentang</a>
+        <a href="#skills">Skills</a>
+        <button class="nav-btn" id="courseNavBtn">Kursus</button>
+      </nav>
+    </div>
+    <button class="signin-btn" id="signinBtn" aria-label="Sign in">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#14B8A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="8" r="4"></circle>
+        <path d="M4 20c0-4 3.5-7 8-7s8 3 8 7"></path>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<!-- ════════════════════════════
+     HERO
+════════════════════════════ -->
+<section class="hero">
+  <div class="container hero-grid">
+    <div>
+      <h1>Platform Pelatihan Singkat High‑Demand Skills Berbasis Microlearning</h1>
+      <p>Tingkatkan keterampilan profesional melalui pembelajaran singkat, fokus, dan relevan dengan kebutuhan industri modern.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════
+     TENTANG — color block layout
+════════════════════════════ -->
+<section id="tentang" class="lp-section">
+  <div class="container">
+    <h2 class="lp-section-title">Tentang Platform Kami</h2>
+    <div class="block-grid">
+      <div class="color-block block-teal">
+        <h3>Microlearning</h3>
+        <p>Materi 5–15 menit agar mudah dipelajari kapan saja, di antara kesibukan harianmu.</p>
+      </div>
+      <div class="color-block block-blue">
+        <h3>Career Ready</h3>
+        <p>Fokus pada keterampilan yang dicari industri, bukan teori yang tidak terpakai.</p>
+      </div>
+      <div class="color-block block-peach">
+        <h3>Praktis</h3>
+        <p>Belajar dengan proyek dan studi kasus nyata yang relevan dengan dunia kerja.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════
+     SKILLS — color block layout
+════════════════════════════ -->
+<section id="skills" class="lp-section">
+  <div class="container">
+    <h2 class="lp-section-title">Keterampilan Populer</h2>
+    <div class="block-grid">
+      <div class="color-block block-mint">
+        <h3>📊 Data Analysis</h3>
+        <p>Mengolah dan membaca data untuk pengambilan keputusan yang lebih baik.</p>
+      </div>
+      <div class="color-block block-yellow">
+        <h3>🤖 AI Prompting</h3>
+        <p>Memanfaatkan AI secara efektif untuk mempercepat pekerjaan sehari-hari.</p>
+      </div>
+      <div class="color-block block-gray">
+        <h3>📱 Digital Marketing</h3>
+        <p>Strategi promosi digital yang efektif untuk menjangkau audiens yang tepat.</p>
+      </div>
+      <div class="color-block block-teal">
+        <h3>🎨 UI/UX Design</h3>
+        <p>Merancang pengalaman pengguna yang intuitif dan mudah digunakan.</p>
+      </div>
+      <div class="color-block block-blue">
+        <h3>💻 Web Development</h3>
+        <p>Membangun website dari dasar hingga siap digunakan secara nyata.</p>
+      </div>
+      <div class="color-block block-peach">
+        <h3>📈 Business Analytics</h3>
+        <p>Menganalisis performa bisnis untuk mendukung strategi yang lebih tepat.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════
+     COURSE MODAL
+════════════════════════════ -->
+<div class="modal-overlay" id="courseModalOverlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="courseModalTitle">
+    <button class="modal-close" id="courseModalClose" aria-label="Tutup">✕</button>
+    <h2 id="courseModalTitle">Kursus SkillBridge</h2>
+    <div class="course-modal-grid">
+      <div class="course-modal-item">
+        <span class="course-modal-icon">📊</span>
+        <h4>Excel Fundamentals</h4>
+        <p>Belajar analisis data dasar menggunakan Excel.</p>
+      </div>
+      <div class="course-modal-item">
+        <span class="course-modal-icon">📈</span>
+        <h4>Data Analysis Basics</h4>
+        <p>Dasar-dasar membaca dan mengolah data untuk keputusan.</p>
+      </div>
+      <div class="course-modal-item">
+        <span class="course-modal-icon">📉</span>
+        <h4>Power BI Essentials</h4>
+        <p>Membuat visualisasi data interaktif dengan Power BI.</p>
+      </div>
+      <div class="course-modal-item">
+        <span class="course-modal-icon">🐍</span>
+        <h4>Python Fundamentals</h4>
+        <p>Otomasi dan pemrosesan data menggunakan Python.</p>
+      </div>
+      <div class="course-modal-item">
+        <span class="course-modal-icon">🤖</span>
+        <h4>AI Prompting for Work</h4>
+        <p>Meningkatkan produktivitas kerja dengan bantuan AI.</p>
+      </div>
+      <div class="course-modal-item">
+        <span class="course-modal-icon">🎨</span>
+        <h4>Canva for Social Media</h4>
+        <p>Membuat konten visual menarik untuk media sosial.</p>
+      </div>
+      <div class="course-modal-item">
+        <span class="course-modal-icon">🖌️</span>
+        <h4>UI/UX Fundamentals</h4>
+        <p>Dasar merancang antarmuka dan pengalaman pengguna.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── Course modal open/close ── */
+const courseModalOverlay = document.getElementById('courseModalOverlay');
+
+function openCourseModal(){
+  courseModalOverlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeCourseModal(){
+  courseModalOverlay.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('courseNavBtn').addEventListener('click', openCourseModal);
+document.getElementById('courseModalClose').addEventListener('click', closeCourseModal);
+courseModalOverlay.addEventListener('click', function(e){
+  if(e.target === courseModalOverlay) closeCourseModal();
+});
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape' && courseModalOverlay.classList.contains('open')) closeCourseModal();
+});
+
+/* ── Sign in / avatar button → goes to the dashboard ── */
+document.getElementById('signinBtn').addEventListener('click', function(){
+  window.location.href = 'dash%20board.html';
+});
+</script>
+</body>
+</html>
